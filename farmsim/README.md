@@ -1,4 +1,4 @@
-# Tic-Tac-Toe 
+# Farming Simulator 
 
 Super minimal tic-tac-toe to illustrate use of `brick`
 
