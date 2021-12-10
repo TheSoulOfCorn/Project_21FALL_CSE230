@@ -1,5 +1,5 @@
 # Farsim
-![image]()
+![image](https://github.com/TheSoulOfCorn/Project_21FALL_CSE230/blob/master/screenshot.png)
 
 ## Background
 This is a farming simulator game based on the brick library. The relieving farming game has been popular for years, focusing on the virtual experience of farmer life with planting, breeding, and more. Our application is to simulate the world-famous game based on brick.
@@ -22,6 +22,6 @@ This is a farming simulator game based on the brick library. The relieving farmi
 
 ## Team Members
 yukiyukiyeah, Muyao-Liu, Onojimi, TheSoulOfCorn
-# For Developers
+## For Developers
 * Compile with `stack build`
 * Play with `stack run`
