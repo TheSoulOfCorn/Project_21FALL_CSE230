@@ -18,6 +18,7 @@ This is a farming simulator game based on the brick library. The relieving farmi
 - Sleep ( +100 energy,  - 1 date)  [You  must go to sleep if the energy turns to 0]
 - Reap grown plants ( +1 score,  -20 energy )
 - The game will end if date turns to 0, you can go to next round or exit the game, the maximum score will be recorded.
+- The plant can be randomly affected by drought or infestation and go bad.
 - More instructions is on the game panel.
 
 ## Team Members
