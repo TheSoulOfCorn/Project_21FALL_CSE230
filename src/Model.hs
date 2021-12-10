@@ -56,14 +56,3 @@ isCurr s r c = Board.pRow p == r && Board.pCol p == c
 
 next :: PlayState -> Board.Result Board.Board -> Either (Board.Result ()) PlayState
 next s (Board.Cont b') = Right (s { psBoard = b'})
-
--- nextBoard :: PlayState -> Board.Result a -> Either (Board.Result ()) PlayState
--- nextBoard s res = case res' of
---                     _           -> Right s' 
---   where 
---     sc'  = Score.add (psScore s) (Board.boardWinner res) 
---     s'   = s { psScore = sc'                   -- update the score
---              , psBoard = mempty                -- clear the board
---              , psTurn  = Score.startPlayer sc' -- toggle start player
---              } 
-
