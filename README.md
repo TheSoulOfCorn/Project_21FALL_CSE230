@@ -1,4 +1,4 @@
-# Farsim
+# Farmsim
 ![image](https://github.com/TheSoulOfCorn/Project_21FALL_CSE230/blob/master/screenshot.png)
 
 ## Background
