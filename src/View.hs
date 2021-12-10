@@ -76,13 +76,13 @@ getStats s = printf "Current Energy = %d,\nScore = %d,\nDate = %d\n" (getEnergy 
             d = psDate s
 
 getInst :: String
-getInst = printf "Press O to plant an Apple,\nPress P to plant a rice,\nPress W to water a plant,\nPress F to apply fertilizer,\nPress C to clean up dead plant,\nBlank Space to Sleep"
+getInst = printf "Press O to plant an Apple,\nPress P to plant a rice,\nPress W to water a plant,\nPress F to apply fertilizer,\nPress C to clean up dead plant,\nPress E to eat up plant\nBlank Space to Sleep"
 
 getInst2 :: String
 getInst2 = printf "\nWhen plants need water their leaves are shrinking \nlike this /\\/\\\n"
 
 getInst3 :: String
-getInst3 = printf "\nWhen plants need water their stems are twisted \n"
+getInst3 = printf "\nWhen plants need fertilizer their stems are twisted \n"
 
 getInst4 :: String
 getInst4 = printf "\nWhen plants are bugged their leaves are abnormal\nlike this X X \n"
