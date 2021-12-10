@@ -2,6 +2,7 @@
 module Model where 
 
 import Prelude hiding ((!!))
+import System.Random
 import qualified Model.Board  as Board
 import qualified Model.Score  as Score
 import qualified Model.Player as Player
@@ -29,7 +30,9 @@ data PlayState = PS
   , psDate   :: Date.Date
   , psPos    :: Board.Pos       -- ^ current cursor
   , psResult :: Board.Result () -- ^ result 
-  , psEnd    :: Bool    
+  , psEnd    :: Bool 
+  , psEnerLow:: Bool   
+  , psRand   :: StdGen
   } 
 
 init :: Int -> PlayState
@@ -38,10 +41,12 @@ init n = PS
   , psEnergy = Energy.init 100
   , psScore  = Score.init 0
   , psBoard  = Board.init
-  , psDate   = Date.init 1
+  , psDate   = Date.init n
   , psPos    = head Board.positions 
   , psResult = Board.Cont ()
   , psEnd    = False
+  , psRand   = mkStdGen 544
+  , psEnerLow= False
   }
 
 isCurr :: PlayState -> Int -> Int -> Bool

@@ -1,7 +1,7 @@
 module View (view) where
 
 import Brick
-import Brick.Widgets.Center (center, )
+import Brick.Widgets.Center 
 import Brick.Widgets.Border (borderWithLabel, hBorder, vBorder)
 import Brick.Widgets.Border.Style (unicode, unicodeBold)
 
@@ -20,8 +20,9 @@ import Graphics.Vty hiding (dim)
 -- view s = [showStats s, field s]
 
 view :: PlayState -> [Widget String]
-view s = [gameEnd s, center $ padRight (Pad 2) inst_sc <+> (field s)]
+view s = [gameEnd s, needSleep s, center $ padRight (Pad 2) inst_sc <+> (field s)]
   where inst_sc = hLimit 50 $ vTile[showInst, (showStats s)]
+
 
 field :: PlayState -> Widget String
 field s = 
@@ -33,24 +34,37 @@ gameEnd :: PlayState -> Widget String
 gameEnd s = 
   if psEnd s == True
     then withBorderStyle unicodeBold
-        $ borderWithLabel (str ("Instructions"))
+        $ borderWithLabel (str ("Game is Over!"))
         $ center
-        $ hLimit 50
-        $ vBox [str  (getStats s)]
+        $ vBox [str (getEnd s)]
+    else emptyWidget
+
+needSleep :: PlayState -> Widget String
+needSleep s = 
+  if psEnerLow s == True
+    then(withBorderStyle unicodeBold
+        $ borderWithLabel (str ("Alert!"))
+        $ center
+        $ vBox [str (getSleep s)]) 
     else emptyWidget
 
 showInst :: Widget String
 showInst = withBorderStyle unicodeBold
   $ borderWithLabel (str ("Instructions"))
   $ center
-  $ hLimit 50
-  $ vBox [str getInst]
+  $ hLimit 80
+  $ vBox [str getInst,
+          str getInst2,
+          str getInst3,
+          str getInst4,
+          str getInst5]
 
 showStats :: PlayState -> Widget String
-showStats s = withBorderStyle unicodeBold
+showStats s = 
+  withBorderStyle unicodeBold
   $ borderWithLabel (str ("Score"))
   $ center
-  $ hLimit 50
+  $ hLimit 80
   $ vBox [str (getStats s)]
 
 
@@ -61,8 +75,31 @@ getStats s = printf "Current Energy = %d,\nScore = %d,\nDate = %d\n" (getEnergy 
             d = psDate s
 
 getInst :: String
-getInst = printf "Press O to plant an Apple,\npress P to plant a rice"
+getInst = printf "Press O to plant an Apple,\nPress P to plant a rice,\nPress W to water a plant,\nPress F to apply fertilizer,\nPress C to clean up dead plant,\nBlank Space to Sleep"
 
+getInst2 :: String
+getInst2 = printf "\nWhen plants need water their leaves are shrinking \nlike this /\\/\\\n"
+
+getInst3 :: String
+getInst3 = printf "\nWhen plants need water their stems are twisted \n"
+
+getInst4 :: String
+getInst4 = printf "\nWhen plants are bugged their leaves are abnormal\nlike this X X \n"
+
+getInst5 :: String
+getInst5 = printf "\nWhen plants are dead their leaves are falling\n"
+
+getInst6 :: String
+getInst6 = printf "\nToo much water/fertilizer can kill the plant\n"
+
+getEnd :: PlayState -> String
+getEnd s = printf "Your final score is %d.\nPress Enter to restart the game.\nOr press Esc to exit." (getScore sc)
+      where sc = psScore s
+
+getSleep :: PlayState -> String
+getSleep s = printf "You don't have enough energy now!\n\nPress blank space to sleep.\nPress E to to one of your grown plant.\nPress A to getback to game.\nNow you have %d scores %d energy" (getScore sc) (getEnergy p)
+      where sc = psScore s
+            p = psEnergy s
 
 mkRow :: PlayState -> Int -> Widget n
 mkRow s row = hTile [ mkCell s row i | i <- [1..dim] ]
@@ -88,43 +125,44 @@ mkCell' s r c = center (mkPlant xoMb)
     --   | otherwise = Nothing
 
 mkPlant :: Maybe Plant -> Widget n
-mkPlant Nothing  = blockB
-mkPlant (Just SeedR0)   = blockSeedR0
-mkPlant (Just SeedR1)   = blockSeedR1
-mkPlant (Just SeedA)   = blockSeedA
+mkPlant Nothing = blockB
+mkPlant (Just SeedR0) = blockSeedR0
+mkPlant (Just SeedR1) = blockSeedR1
+mkPlant (Just SeedA) = blockSeedA
 mkPlant (Just Good_nw_fR) = blockNeedW
 mkPlant (Just Good_nw_nfR) = blockNeedWF
 mkPlant (Just Good_w_nfR) = blockNeedF
+mkPlant (Just GoodR) = blockNormal
 mkPlant (Just Good_nw_fA) = blockNeedW
 mkPlant (Just Good_nw_nfA) = blockNeedWF
 mkPlant (Just Good_w_nfA) = blockNeedF
+mkPlant (Just GoodA) = blockNormal
 mkPlant (Just BuggedA) = blockAbnormal
 mkPlant (Just BuggedR) = blockAbnormal
 mkPlant (Just Bad) = blockBad
-mkPlant (Just GrownA) = blockGrown
-mkPlant (Just GrownR) = blockGrown
+mkPlant (Just GrownA) = blockGrownA
+mkPlant (Just GrownR) = blockGrownR
 
-blockB, blockSeedR0, blockSeedR1, blockSeedA, blockNormal, blockAbnormal, blockGrown :: Widget n
+blockB, blockSeedR0, blockSeedR1, blockSeedA, blockNormal, blockAbnormal, blockGrownA, blockGrownR :: Widget n
 blockB = vBox (replicate 5 (str "     "))
 
 blockSeedR0  = vBox [ str "     "
-                   , str "     "
-                   , str "  _  "
-                   , str " / \\ "
-                   , str " \\_/ "] 
+                    , str "     "
+                    , str "  _  "
+                    , str " / \\ "
+                    , str " \\_/ "] 
                    
 blockSeedR1  = vBox [ str "     "
-                   , str "  *  "
-                   , str "  *  "
-                   , str " / \\ "
-                   , str " \\_/ "]
-
-                
+                    , str "     "
+                    , str "  *  "
+                    , str " / \\ "
+                    , str " \\_/ "]
+               
 blockSeedA  = vBox [ str "     "
-                   , str "  *  "
-                   , str " * * "
-                   , str "  *  "
-                   , str "     "] 
+                   , str "     "
+                   , str "  x  "
+                   , str " / \\ "
+                   , str " \\_/ "]  
 
 blockNormal = vBox [ str "     "
                    , str "\\   /"
@@ -162,11 +200,17 @@ blockBad =      vBox [ str "     "
                      , str " /|\\ "
                      , str "  |  "]
         
-blockGrown =    vBox [ str "  O  "
+blockGrownR =   vBox [ str "  O  "
                      , str "o | o"
                      , str " \\|/ "
                      , str "  |  "
                      , str "  |  "]
+
+blockGrownA =    vBox [ str "     "
+                      , str "     "
+                      , str " _|_ "
+                      , str "(___)"
+                      , str "     "]
 
 vTile :: [Widget n] -> Widget n
 vTile (b:bs) = vBox (b : [hBorder <=> b | b <- bs])

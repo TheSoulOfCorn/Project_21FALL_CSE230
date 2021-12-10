@@ -5,6 +5,7 @@ module Model.Date
 
     -- * Energy API
   , init
+  , resetDate
   , getDate
   , dateDown
   )
@@ -19,6 +20,9 @@ data Date = Date
 
 init :: Int -> Date
 init n = Date n 0 
+
+resetDate :: Int -> Date -> Date
+resetDate num d =  d {dFarmer = num}
 
 getDate :: Date -> Int
 getDate Date {..} =  dFarmer

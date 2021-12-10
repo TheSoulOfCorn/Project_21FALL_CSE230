@@ -30,7 +30,7 @@ version = Version [0,1,0,0] []
 bindir, libdir, dynlibdir, datadir, libexecdir, sysconfdir :: FilePath
 
 bindir     = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/bin"
-libdir     = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/lib/x86_64-linux-ghc-8.10.7/brick-tac-toe-0.1.0.0-7k2nndVDpSIFAvzfPtU4yh-brick-tac-toe"
+libdir     = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/lib/x86_64-linux-ghc-8.10.7/brick-tac-toe-0.1.0.0-v06UjNfc9f2AYnrTgjwie-brick-tac-toe"
 dynlibdir  = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/lib/x86_64-linux-ghc-8.10.7"
 datadir    = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/share/x86_64-linux-ghc-8.10.7/brick-tac-toe-0.1.0.0"
 libexecdir = "/home/cse230/farmsim/.stack-work/install/x86_64-linux-tinfo6/44b20a642914a1d157a9b16b2ae753af0ba9db63350a512ec32dea172d82e409/8.10.7/libexec/x86_64-linux-ghc-8.10.7/brick-tac-toe-0.1.0.0"

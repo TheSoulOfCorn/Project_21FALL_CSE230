@@ -3,6 +3,7 @@ module Control where
 import Brick hiding (Result)
 import qualified Graphics.Vty as V
 import qualified Brick.Types as T
+import System.Random hiding(next)
 
 import Model
 import Model.Board
@@ -26,7 +27,9 @@ control s ev = case ev of
   T.VtyEvent (V.EvKey (V.KChar 'c') _) -> nextClean s  =<< liftIO (farmClean s)
   T.VtyEvent (V.EvKey (V.KChar 'r') _) -> nextReap s  =<< liftIO (farmReap s)
   T.VtyEvent (V.EvKey (V.KChar 'e') _) -> nextEat s  =<< liftIO (farmEat s)
-  T.VtyEvent (V.EvKey V.KEnter _) -> nextSleep s  =<< liftIO (farmSleep s)
+  T.VtyEvent (V.EvKey (V.KChar ' ') _) -> nextSleep s  =<< liftIO (farmSleep s)
+  T.VtyEvent (V.EvKey (V.KChar 'a') _) -> nextConfirm s  =<< liftIO (farmConfirm s)
+  T.VtyEvent (V.EvKey V.KEnter _) -> nextRestart s  =<< liftIO (farmRestart s)
   T.VtyEvent (V.EvKey V.KUp   _)  -> Brick.continue (move up    s)
   T.VtyEvent (V.EvKey V.KDown _)  -> Brick.continue (move down  s)
   T.VtyEvent (V.EvKey V.KLeft _)  -> Brick.continue (move left  s)
@@ -77,13 +80,34 @@ farmClean s =
   else putClean (psBoard s) (psEnergy s) <$> getPos s
 
 farmEat s = putEat (psBoard s) (psScore s) <$> getPos s
-farmSleep s =  putSleep (psBoard s) (psEnergy s) <$> getPos s
+
+farmRestart s =  putRestart (psBoard s) <$> getPos s
+
+farmConfirm s =  putConfirm (psBoard s) <$> getPos s
+
+farmSleep s =  putSleep (psBoard s) acc <$> (randomStrategy (psPos s) (psBoard s))
+                where acc = fst (getRand (psRand s))
     
 getPos :: PlayState -> IO Pos
 getPos s  = getStrategy s (psPos s) (psBoard s) 
 
 getStrategy :: PlayState -> Strategy
 getStrategy s = playerStrat (psFarmer s)
+-------------------------------------------------------------------------------
+---------------------Randomness for Accidents----------------------------------
+-------------------------------------------------------------------------------
+
+randomStrategy :: a -> Board -> IO Pos
+randomStrategy _ b = selectRandom ((takenPositions b) ++ (emptyPositions b)) 
+
+selectRandom :: [a] -> IO a
+selectRandom xs = do
+  i <- randomRIO (0, length xs - 1)
+  return (xs !! i)
+
+getRand :: StdGen -> (Int, StdGen)
+getRand g = randomR (1, 4) g
+-------------------------------------------------------------------------------
 
 sowS :: PlayState -> PlayState
 sowS s = s {psEnergy  = energyDown (psEnergy s) 20}
@@ -110,7 +134,20 @@ eatS s = s {psEnergy = energyUp (psEnergy s) 50,
 
 sleepS :: PlayState -> PlayState
 sleepS s = s {psEnergy = energyUp (psEnergy s) 100,
-              psDate = dateDown (psDate s)}
+              psDate = dateDown (psDate s),
+              psRand = snd(getRand(psRand s)),
+              psEnerLow = False }
+
+restartS :: PlayState -> PlayState
+restartS s = s {psEnergy = energyUp (psEnergy s) 100,
+                psDate = resetDate 3 (psDate s),
+                psEnd = False }
+
+needEnergyS :: PlayState -> Int -> PlayState
+needEnergyS s e = if (getEnergy (psEnergy s)) - e < 0 then s {psEnerLow = True} else s {psEnerLow = False}
+
+confirmS :: PlayState -> PlayState
+confirmS s = s {psEnerLow = False}
 
 endS :: PlayState -> PlayState
 endS s = s {psEnd = True}
@@ -122,28 +159,34 @@ nextFert :: PlayState -> Result Board -> EventM n (Next PlayState)
 nextReap :: PlayState -> Result Board -> EventM n (Next PlayState)
 nextClean :: PlayState -> Result Board -> EventM n (Next PlayState)
 -------------------------------------------------------------------------------
+--Sow/Reap takes 20 energy, water/debug/fert takes 10 energy-------------------
+-------------------------------------------------------------------------------
 nextSow s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (sowS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 20) else continue (sowS s')
   Left res -> halt (s { psResult = res }) 
 
 nextWater s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (waterS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 10) else continue (waterS s')
   Left res -> halt (s { psResult = res }) 
 
 nextDebug s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (debugS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 10) else continue (debugS s')
   Left res -> halt (s { psResult = res }) 
 
 nextFert s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (fertS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 10) else continue (fertS s')
   Left res -> halt (s { psResult = res }) 
 
 nextReap s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (reapS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 20) else continue (reapS s')
   Left res -> halt (s { psResult = res }) 
 
 nextClean s b = case next s b of
-  Right s' -> if (result (psBoard s) == b) then continue s' else continue (cleanS s')
+  Right s' -> if (result (psBoard s) == b) then continue (needEnergyS s' 10) else continue (cleanS s')
+  Left res -> halt (s { psResult = res }) 
+
+nextConfirm s b = case next s b of
+  Right s' -> continue (confirmS s')
   Left res -> halt (s { psResult = res }) 
 
 -------------------------------------------------------------------------------
@@ -156,5 +199,9 @@ nextSleep s b = case next s b of
   Left res -> halt (s { psResult = res }) 
 
 nextEat s b = case next s b of
-  Right s' -> if (getScore (psScore s) == 0) then continue s' else continue (eatS s')
+  Right s' -> if (getScore (psScore s) == 0) then continue s' else continue (needEnergyS (eatS s') 0)
+  Left res -> halt (s { psResult = res })
+
+nextRestart s b = case next s b of
+  Right s' -> continue (restartS s')
   Left res -> halt (s { psResult = res })

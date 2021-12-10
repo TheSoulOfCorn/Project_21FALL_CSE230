@@ -16,4 +16,4 @@ type Strategy = Pos      -- ^ current cursor
               -> IO Pos  -- ^ next move
 
 human :: Player 
-human = Player 100 (\p  _ -> return p)
+human = Player 100 (\p _ -> return p)

@@ -133,7 +133,7 @@
 #endif /* MIN_TOOL_VERSION_strip */
 
 #ifndef CURRENT_COMPONENT_ID
-#define CURRENT_COMPONENT_ID "brick-tac-toe-0.1.0.0-7l6HvpYM3vc4CbbE0UoKEs-tests"
+#define CURRENT_COMPONENT_ID "brick-tac-toe-0.1.0.0-AdhMoxmbwUF7KLgOp6XNyD-tests"
 #endif /* CURRENT_COMPONENT_ID */
 #ifndef CURRENT_PACKAGE_VERSION
 #define CURRENT_PACKAGE_VERSION "0.1.0.0"
