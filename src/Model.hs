@@ -30,9 +30,9 @@ data PlayState = PS
   , psDate   :: Date.Date
   , psPos    :: Board.Pos       -- ^ current cursor
   , psResult :: Board.Result () -- ^ result 
-  , psEnd    :: Bool 
-  , psEnerLow:: Bool   
-  , psRand   :: StdGen
+  , psEnd    :: Bool            -- whether the game is over
+  , psEnerLow:: Bool            -- whether player needs rest/eat
+  , psRand   :: StdGen          -- random event generator
   } 
 
 init :: Int -> PlayState

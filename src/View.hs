@@ -1,4 +1,4 @@
-module View (view) where
+module View (view, myMap) where
 
 import Brick
 import Brick.Widgets.Center 
@@ -20,9 +20,22 @@ import Graphics.Vty hiding (dim)
 -- view s = [showStats s, field s]
 
 view :: PlayState -> [Widget String]
-view s = [gameEnd s, needSleep s, center $ padRight (Pad 2) inst_sc <+> (field s)]
-  where inst_sc = hLimit 50 $ vTile[showInst, (showStats s)]
+view s = [gameEnd s, withAttr alertAttr $ (needSleep s), center $ padRight (Pad 2) inst_sc <+> (withAttr fieldAttr(field s))]
+  where inst_sc = hLimit 50 $ vTile[withAttr instAttr $ showInst, withAttr scoreAttr $ (showStats s)]
 
+instAttr = attrName "instruction"
+scoreAttr = attrName "score"
+fieldAttr = attrName "field"
+alertAttr = attrName "alert"
+
+myMap :: PlayState -> AttrMap
+myMap _ = attrMap defAttr
+  [
+    (instAttr, fg yellow ), 
+    (scoreAttr, fg brightBlue ),
+    (fieldAttr, fg green),
+    (alertAttr, fg brightRed)
+  ]
 
 field :: PlayState -> Widget String
 field s = 
