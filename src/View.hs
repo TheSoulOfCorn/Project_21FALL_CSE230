@@ -27,7 +27,7 @@ view s = [gameEnd s, needSleep s, center $ padRight (Pad 2) inst_sc <+> (field s
 field :: PlayState -> Widget String
 field s = 
   withBorderStyle unicode $
-    borderWithLabel (str (getStats s)) $
+    borderWithLabel (str ("FarmSim")) $
       vTile [ mkRow s row | row <- [1..dim] ]
 
 gameEnd :: PlayState -> Widget String
@@ -57,7 +57,8 @@ showInst = withBorderStyle unicodeBold
           str getInst2,
           str getInst3,
           str getInst4,
-          str getInst5]
+          str getInst5,
+          str getInst6]
 
 showStats :: PlayState -> Widget String
 showStats s = 
@@ -69,7 +70,7 @@ showStats s =
 
 
 getStats :: PlayState -> String
-getStats s = printf "Current Energy = %d,\nScore = %d,\nDate = %d\n" (getEnergy p) (getScore sc) (getDate d)
+getStats s = printf "Current Energy = %d,\nScore = %d,\nDate = %d\n" (getEnergy p) (getCurrScore sc) (getDate d)
       where p = psEnergy s
             sc = psScore s
             d = psDate s
@@ -93,11 +94,11 @@ getInst6 :: String
 getInst6 = printf "\nToo much water/fertilizer can kill the plant\n"
 
 getEnd :: PlayState -> String
-getEnd s = printf "Your final score is %d.\nPress Enter to restart the game.\nOr press Esc to exit." (getScore sc)
+getEnd s = printf "Your final score is %d.\nMaxScore is %d.\nPress Enter to restart the game.\nOr press Esc to exit." (getCurrScore sc) (getMaxScore sc)
       where sc = psScore s
 
 getSleep :: PlayState -> String
-getSleep s = printf "You don't have enough energy now!\n\nPress blank space to sleep.\nPress E to to one of your grown plant.\nPress A to getback to game.\nNow you have %d scores %d energy" (getScore sc) (getEnergy p)
+getSleep s = printf "You don't have enough energy now!\n\nPress blank space to sleep.\nPress E to to one of your grown plant.\nPress A to getback to game.\nNow you have %d scores %d energy" (getCurrScore sc) (getEnergy p)
       where sc = psScore s
             p = psEnergy s
 

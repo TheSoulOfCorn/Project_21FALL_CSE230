@@ -141,6 +141,7 @@ sleepS s = s {psEnergy = energyUp (psEnergy s) 100,
 restartS :: PlayState -> PlayState
 restartS s = s {psEnergy = energyUp (psEnergy s) 100,
                 psDate = resetDate 3 (psDate s),
+                psScore = setZero (psScore s),
                 psEnd = False }
 
 needEnergyS :: PlayState -> Int -> PlayState
@@ -150,7 +151,8 @@ confirmS :: PlayState -> PlayState
 confirmS s = s {psEnerLow = False}
 
 endS :: PlayState -> PlayState
-endS s = s {psEnd = True}
+endS s = s {psEnd = True,
+            psScore = setMaxScore (psScore s)}
 -------------------------------------------------------------------------------
 nextSow :: PlayState -> Result Board -> EventM n (Next PlayState)
 nextWater :: PlayState -> Result Board -> EventM n (Next PlayState)
@@ -199,7 +201,7 @@ nextSleep s b = case next s b of
   Left res -> halt (s { psResult = res }) 
 
 nextEat s b = case next s b of
-  Right s' -> if (getScore (psScore s) == 0) then continue s' else continue (needEnergyS (eatS s') 0)
+  Right s' -> if (getCurrScore (psScore s) == 0) then continue s' else continue (needEnergyS (eatS s') 0)
   Left res -> halt (s { psResult = res })
 
 nextRestart s b = case next s b of
